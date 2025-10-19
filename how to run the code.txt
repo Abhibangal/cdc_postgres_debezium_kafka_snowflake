@@ -1,0 +1,21 @@
+Running the CDC Pipeline
+
+Start the containers
+Run the following command in your terminal to spin up all services using Docker Compose:
+
+docker compose up -d
+
+
+Verify connector registration
+After the containers are running, check the register-connector service to confirm that the connections for Postgres and Snowflake are established.
+
+Validate data flow
+
+Monitor Snowflake logs to ensure data is being ingested.
+
+After approximately 15 minutes, verify that data has propagated to the SCD2 table.
+
+Debugging
+For troubleshooting or debugging steps, refer to:
+
+debugging_command.txt
