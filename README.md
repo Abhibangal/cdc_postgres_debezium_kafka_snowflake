@@ -8,11 +8,11 @@ It captures **log-based changes from PostgreSQL’s Write-Ahead Logs (WAL)**, st
 ## 📁 Project Overview
 
 ### Components:
-- **Postgres** – Source database for CDC (configured with WAL-based replication)
-- **Debezium** – Reads WAL logs to capture insert, update, and delete events
-- **Kafka & Kafka Connect** – Streams CDC events and manages connectors
-- **Snowflake Connector** – Ingests data from Kafka topics into Snowflake tables
-- **Docker Compose** – Manages and orchestrates all containerized services
+- **Postgres** – Source database configured with WAL-based CDC (Write-Ahead Logs)
+- **Debezium** – Captures database change events from Postgres WAL logs
+- **Kafka & Kafka Connect** – Handles message streaming and connector management
+- **Snowflake Connector** – Consumes Kafka topics and writes to Snowflake
+- **Docker Compose** – Orchestrates and runs all containerized services
 
 ---
 
@@ -20,19 +20,26 @@ It captures **log-based changes from PostgreSQL’s Write-Ahead Logs (WAL)**, st
 
 ```
 ├── connectors/
-│   └── snowflake-kafka-connector.jar      # Downloaded Snowflake Kafka connector
+│   └── snowflake/                         # Contains all Snowflake Kafka connector JARs and related files
 │
-├── kafka/
-│   └── connect/
-│       ├── jar/                           # Contains Snowflake connector JAR
-│       └── ...                            # Debezium connectors run here
+├── init_connectors/
+│   ├── postgres-connector.json            # Debezium connector configuration for Postgres (WAL-based CDC)
+│   ├── snowflake-connector.json           # Kafka connector configuration for Snowflake
+│   └── register-connectors.sh             # Script to register both connectors
 │
-├── postgres-connector.json                # Debezium connector config for Postgres (WAL-based)
-├── snowflake-connector.json               # Kafka connector config for Snowflake
-├── docker-compose.yaml                    # Docker setup for all services
-├── RUN_GUIDE.txt                          # Instructions to run the pipeline
-├── debugging_command.txt                  # Commands used for debugging
-└── README.md                              # You are here
+├── postgres/
+│   ├── 01_table_creation.sql              # Postgres DDL scripts for table setup
+│   ├── 02_admin_queries.sql               # Admin-level Postgres queries
+│   └── 03_insert_into_user_query.sql      # Sample insert statements for CDC testing
+│
+├── snowflake/
+│   ├── 01_admin_queries_snowflake.sql     # Snowflake admin and setup queries
+│   └── 02_SCD_2_Dynamic_table_queries.sql # Dynamic table and SCD Type 2 logic queries
+│
+├── docker-compose.yaml                    # Docker setup for Postgres, Kafka, Debezium, and connectors
+├── RUN_GUIDE.txt                          # Step-by-step guide to run and validate the pipeline
+├── debugging_command.txt                  # Commands for troubleshooting and debugging
+└── README.md                              # Project documentation (this file)
 ```
 
 ---
@@ -46,23 +53,27 @@ cd <your-repo-name>
 ```
 
 ### 2. Start the Docker Containers
-Spin up all containers using:
+Spin up all services using Docker Compose:
 ```bash
 docker compose up -d
 ```
-
-This starts Postgres, Kafka, Zookeeper, Debezium Connect, and other required services.
+This will start Postgres, Kafka, Zookeeper, and Debezium Connect containers.
 
 ---
 
 ## 🔗 Connector Setup
 
-### 3. Verify Connector Registration
-After startup, check the **`register-connector`** service logs to confirm both connectors are registered:
-- **Postgres connector** → Captures CDC events from WAL logs  
-- **Snowflake connector** → Pushes the captured events into Snowflake
+After the containers are running, register the connectors by executing the script inside the **init_connectors** folder:
 
-You can verify connector status via:
+```bash
+bash init_connectors/register-connectors.sh
+```
+
+This registers:
+- **Postgres connector** → Reads WAL logs for CDC
+- **Snowflake connector** → Writes CDC data into Snowflake
+
+You can verify connector registration and status via:
 ```bash
 docker logs connect
 ```
@@ -72,9 +83,9 @@ docker logs connect
 ## ❄️ Snowflake Configuration
 
 In Snowflake:
-- Created a **dynamic table** to implement **Slowly Changing Dimension (SCD) Type 2** logic.  
-- Data flows from the **`raw_use_log`** table (populated from Postgres WAL events) into the **SCD2-managed table**.  
-- Transformation and merge logic are defined using Snowflake SQL dynamic table queries included in this repository.
+- Create the necessary database, schema, and stage using **`01_admin_queries_snowflake.sql`**  
+- Use **`02_SCD_2_Dynamic_table_queries.sql`** to set up the **dynamic table** for implementing **Slowly Changing Dimension (SCD) Type 2**
+- The data flows from the **raw_use_log** table (ingested via Kafka) to the **SCD2 dynamic table**
 
 ---
 
@@ -84,18 +95,18 @@ If you face issues during setup or runtime, refer to:
 ```
 debugging_command.txt
 ```
-
-This file contains commonly used commands for inspecting Kafka topics, connector logs, and Docker container health.
+This file contains helpful Docker, Kafka, and connector debugging commands.
 
 ---
 
 ## 🧾 Reference Files
 
-- **`RUN_GUIDE.txt`** – Step-by-step guide to run and validate the pipeline  
-- **`debugging_command.txt`** – Useful CLI commands for troubleshooting  
-- **`docker-compose.yaml`** – Orchestration of Postgres, Kafka, Debezium, and Snowflake  
-- **`postgres-connector.json`** – Debezium configuration for WAL-based CDC  
-- **`snowflake-connector.json`** – Kafka connector configuration for Snowflake ingestion  
+- **`RUN_GUIDE.txt`** – Quick guide for running and validating the pipeline  
+- **`debugging_command.txt`** – Useful commands for troubleshooting  
+- **`docker-compose.yaml`** – Service orchestration for all CDC components  
+- **`postgres`** folder – All Postgres SQL setup scripts  
+- **`snowflake`** folder – All Snowflake setup and SCD2 logic scripts  
+- **`init_connectors`** – JSON configs and registration scripts for connectors
 
 ---
 
@@ -120,6 +131,7 @@ Postgres (WAL Logs)
 ---
 
 ## 🧰 Tools & Technologies
+
 - **Docker / Docker Compose**
 - **PostgreSQL (WAL-based CDC)**
 - **Kafka / Zookeeper**
@@ -129,9 +141,9 @@ Postgres (WAL Logs)
 
 ---
 
-## 📜 Author & Notes
+## 📜 Notes
 
 This setup demonstrates an **end-to-end, log-based CDC pipeline** using PostgreSQL’s **Write-Ahead Logs (WAL)** for data capture.  
-It provides a reliable and scalable approach to synchronize source data changes into Snowflake with **SCD Type 2** logic for historical tracking.  
+It ensures near real-time synchronization from Postgres to Snowflake with **SCD Type 2** handling for historical data tracking.  
 
-Refer to the included guide files for **running instructions**, **connector setup**, and **debugging commands**.
+Refer to the included guide files for detailed setup, execution, and debugging steps.
