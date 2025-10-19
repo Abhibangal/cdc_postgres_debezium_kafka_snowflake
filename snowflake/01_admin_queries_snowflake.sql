@@ -7,13 +7,7 @@ create or replace user svc_kafka_snowflake
 type = service
 default_role = 'ACCOUNTADMIN'
 default_Warehouse = 'compute_wh'
-rsa_public_key = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3SBkxkH1/+kf6iPdquwD
-AUCrYqOXckY/BN/bz6+gPp6HIBn7SVt8Bmy4XZ1mk/K8GAQLbRAxSPkfsV74xacF
-HOsFKHqj72vdMEHtBLCm4o7WDzQIsIm8KMFdSYWJHRINxzxrd8aeb2NFTvuzNWOM
-LS3qT9095PwzoubcHNtdOVRMlSJeBNTJiRCl0rAenPn6s+harCLRjnpjc/3fZXJR
-vfqnHvn84FeNX4yT+Ju0xNQtrZq9U0H079hJADZc9Udtc0VZbKyoMbo5Bn9ctNpx
-H8nzeU9Sdh3W369bTH1KmIzqIdbYCu3XTRb6IaaeRQLLNm1Ialm81x+K9eJ1ZfqL
-jwIDAQAB';
+rsa_public_key = '<public key generated from openssl>';
 
 -- I have assigned the accountadmin role to service user for now , but if you want to create a custom role specific below privileges to that role.
 -- give usage on database and schema where you want to ingest the logs
