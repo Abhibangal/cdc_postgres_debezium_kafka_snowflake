@@ -1,0 +1,20 @@
+{
+  "name": "snowflake-connector",
+  "config": {
+    "connector.class": "com.snowflake.kafka.connector.SnowflakeSinkConnector",
+    "tasks.max": "1",
+    "topics": "pgserver.public.users",
+    "snowflake.topic2table.map":"pgserver.public.users:user_logs",
+    "snowflake.url.name": "umwsqbd-ta71096.snowflakecomputing.com:443",
+    "snowflake.user.name": "svc_kafka_snowflake",
+    "snowflake.private.key": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDdIGTGQfX/6R/q\nI92q7AMBQKtio5dyRj8E39vPr6A+nocgGftJW3wGbLhdnWaT8rwYBAttEDFI+R+x\nXvjFpwUc6wUoeqPva90wQe0EsKbijtYPNAiwibwowV1JhYkdEg3HPGt3xp5vY0VO\n+7M1Y4wtLepP3T3k/DOi5twc2105VEyVIl4E1MmJEKXSsB6c+fqz6FqsItGOemNz\n/d9lclG9+qce+fzgV41fjJP4m7TE1C2tmr1TQfTv2EkANlz1R21zRVlsrKgxujkG\nf1y02nEfyfN5T1J2Hdbfr1tMfUqYjOoh1tgK7ddNFvohpp5FAss2bUhqWbzXH4r1\n4nVl+ouPAgMBAAECggEABpAEjaG9hEfN66v+0yjH+gyKSZYjU3/kNOfT5TkIH3Oi\n/P/oZkfxyVsGqbiXJ8LndCsCj80QOWMzXpc7+Nm5HB+ZepcRMHTaDqmWODJp8YVd\nsvvPWjXsQKVkeF8fL56ujAAuDFL3tsSSdQKhUe9PZLPdJVuij54whiAl3jFgdegN\ncmh1T7cJWLD5YW1Cs9sxBECqZ1+d+DSpzVFh7GCSlMaVE5gUARmfMFh3JLb76jbv\noqCQE8Sh5KID6W5t1Whl0qnrViCt2TQkrrdqCK4xkMOVFPnlNfxCZWQLTwWOkGud\n/rHp8XJfYAJ1QGvUaywhI949PZO4FMItWsxF0q7qOQKBgQDvC2t8VkjHyhoqwG9K\ntCNXZSeVJZLbItRY4uuM2fsVd+qgDQgI5/Dj9dkifSZKnbWAIlVxMgtYOEbzWGZZ\n7dRfhHWcoixrjus7Fjp0Rjt7GoLq+TRhrgx/hoDUxjoNVaV5uYFwObbS6Icokgch\nWWeiF2Ex1mr0+54kB6pt3dp4ywKBgQDsz53pKU1ZC6ehlUMMW+NKRj1UMjEFDbh3\njNXgmAk0/R+1tLz2lEmq3XCl19a68OmF++kz3kHYLJbsK2Mgqjt7CZBtrnbDbge8\nJbGolYzlkuFxdZQjNR5SQuFN6105DXFSW3Jo0p8FIdpH5yOnskeKhSJRTeqdJlzt\ntlRgpNpTzQKBgQCGe4A+9TQA4lySTKzP9EQluMzqBbd2/UNFtnQaS9AMJeijnnE0\nwXguZ3N/CbVvKQahTa+P/T2QpiiUYtlCIqDmE9kvA7XF1SPVnA3KuHBiM2oP0596\njLaPUBZOni6urc5oisqdXnrScOsJEg5c3rWE5W5S4XRO2vf/ASkKolN0vQKBgQDo\ny+jmj220Pdra48r32VUFbStZG8ZIu4Y+MDsJASz75GJJ1JV2qawJxoq43gf/2lkX\nF9/W14VPJ/Zt0PEv6WlzuKE80ad60y3TbhLKMcpC3TO2v+mS+uMF5y1p1hjcvzRJ\nzBAasAMXnoHg8X6Bmqbtq5di6f/b4Ry1quoj36upeQKBgQDimtJQXGCjmhAY0gf7\ni6QahdMPuPh3wIiCfLO3/uDYtjQk7NYC6Vk+xxy6vIQA8hsICX1rPEPRlFPmfOGb\n8xCYXp/IMIO08ZApu2kY9X1w4CimK7CWo5HY1IhwXMGBJV2mKW/iVEijKBxAaaZU\nRpej+GCsAPvMChnb/I6vrFJMZw==",
+    "snowflake.database.name": "DWH_PROD",
+    "snowflake.schema.name": "ECOMM_SCH",
+    "buffer.count.records": "10",
+    "buffer.flush.time": "60",
+    "buffer.size.bytes": "5000000",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
+  }
+}

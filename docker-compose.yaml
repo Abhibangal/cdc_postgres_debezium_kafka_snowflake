@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1      
+
+  connect:
+    image: debezium/connect:2.3
+    depends_on:
+      - kafka
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      # PLUGIN_PATH: /kafka/connect/debezium-connector-postgres
+      PLUGIN_PATH: /kafka/connect,/kafka/connect/jars
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    volumes:
+      - ./connectors/snowflake:/kafka/connect/jars
+
+  register-connectors:
+    image: curlimages/curl:8.5.0
+    depends_on:
+      - connect
+    volumes:
+        - ./init-connectors:/init-connectors
+        - ./connectors:/kafka/connectors
+      
+    entrypoint: >
+      sh -c "cd /init-connectors && ls -l && chmod +x *.json && pwd && sh register-connectors.sh"
+    # sh -c "chmod +x ./init-connectors/register-connectors.sh &&
+     #   ./init-connectors/register-connectors.sh"
+

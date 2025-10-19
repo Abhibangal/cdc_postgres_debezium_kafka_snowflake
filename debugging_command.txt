@@ -1,0 +1,36 @@
+//debuging run on to VS CODE or your local machine thats why i used localhost. If you want to run on docker exec use existing service name instead of localhost
+// First check whether connectors are active or not . Output should give list of connector active and connected to kafka in our case 
+// it will be postgres connector and snowflake kafka connector
+curl -s http://localhost:8083/connectors | jq
+
+//check whether kafka is active 
+curl http://localhost:8083/
+// check your plugins
+
+curl -s http://localhost:8083/connector-plugins | jq
+
+//check whether postgres   debezium  able to connect to kafka 
+
+curl -X POST http://localhost:8083/connectors \
+-H "Content-Type: application/json" \
+-d @init-connectors/postgres-connector.json
+
+//check whether kafka connect able to establish connection with snowflake
+curl -X POST http://localhost:8083/connectors \
+-H "Content-Type: application/json" \
+-d @init-connectors/snowflake-connector.json
+
+// check the error during connection of snowflake kafka connector to kafka
+curl -X PUT http://localhost:8083/connector-plugins/com.snowflake.kafka.connector.SnowflakeSinkConnector/config/validate \
+-H "Content-Type: application/json" \
+-d @init-connectors/snowflake-connector.json | jq
+
+
+
+//to chec individual connector status
+curl -s http://localhost:8083/connectors/postgres-connector/status | jq 
+curl -s http://localhost:8083/connectors/snowflake-connector/status | jq 
+
+//check whether data is coming from debezium to kafka using consumer. RUN THIS ON DOCKER EXEC 
+kafka-console-consumer --bootstrap-server kafka:9092 --topic pgserver.public.users --from-beginning
+kafka-consumer-groups --bootstrap-server kafka:9092 --describe --group 

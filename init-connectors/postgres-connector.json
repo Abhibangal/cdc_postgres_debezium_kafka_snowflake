@@ -1,0 +1,18 @@
+{
+  "name": "postgres-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "host.docker.internal",
+    "database.port": "5432",
+    "database.user": "abhijitbangal",
+    "database.password": "Vihaabhiksha@143",
+    "database.dbname": "sales_db",
+    "topic.prefix": "pgserver",
+    "plugin.name": "pgoutput",
+    "publication.name": "my_publication",
+    "slot.name": "my_slot",
+    "tombstones.on.delete": "false",
+    "table.include.list": "public.users",   
+    "snapshot.mode": "initial"              
+  }
+}
